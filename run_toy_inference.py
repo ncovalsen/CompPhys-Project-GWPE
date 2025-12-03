@@ -1,9 +1,9 @@
-"""Entry point script for the sine-Gaussian toy inference.
+"""Entry point script for the GW toy inference.
 
 This script:
-1. Generates synthetic data with a known injected sine-Gaussian signal.
+1. Generates synthetic data with a known injected GW signal.
 2. Runs a Metropolis–Hastings MCMC sampler to infer the parameters
-   (A, t0, f0) of the signal.
+   (mass1, mass2, spin1z, spin2z) of the signal.
 3. Saves the raw chain and summary statistics to the ``results/``
    directory.
 4. Produces diagnostic plots in ``results/``:
@@ -20,12 +20,12 @@ from typing import Dict, Any
 import numpy as np
 
 from toy_inference.config import ToyModelConfig
-from toy_inference.data import simulate_sine_gaussian_data, save_simulated_data
+from toy_inference.data import simulate_gw_data, save_simulated_data
 from toy_inference.likelihood import log_posterior
 from toy_inference.mcmc import run_mcmc
 from toy_inference.plotting import plot_data_and_model, plot_1d_posteriors
-from toy_inference.waveform import sine_gaussian
-
+from toy_inference.waveform import gw_waveform
+from toy_inference.utils import mc_q_to_masses
 
 # Project-level directories (relative to the repository root)
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -35,7 +35,6 @@ RESULTS_DIR = PROJECT_ROOT / "results"
 
 
 def ensure_directories() -> None:
-    """Create the standard ``data/`` and ``results/`` directories."""
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -43,42 +42,49 @@ def ensure_directories() -> None:
 def main() -> None:
     ensure_directories()
 
-    # Configuration for this run.
     cfg = ToyModelConfig()
 
-    # 1. Generate synthetic data and save it under data/
-    sim_data = simulate_sine_gaussian_data(
-        duration=0.5,
+    # 1. Generate synthetic GW data and save it under data/
+    sim_data = simulate_gw_data(
         fs=2048.0,
-        noise_sigma=0.1,
-        A=1.0,
-        t0=0.25,
-        f0=150.0,
-        tau=cfg.tau,
-        phi0=cfg.phi0,
+        noise_sigma=1e-22,
+        mass1=10.0,
+        mass2=10.0,
+        spin1z=0.9,
+        spin2z=0.0,
+        f_lower=40.0,
         random_seed=42,
     )
 
-    data_path = DATA_DIR / "sine_gaussian_injection.npz"
+    data_path = DATA_DIR / "gw_injection.npz"
     save_simulated_data(sim_data, data_path)
 
+    tp = sim_data.true_params
     print(f"Synthetic data saved to: {data_path}")
-    print("True injected parameters (A, t0, f0):", sim_data.true_params)
+    print(
+        "True injected parameters (mass1, mass2, spin1z, spin2z):",
+        (tp.mass1, tp.mass2, tp.spin1z, tp.spin2z),
+    )
 
     # 2. Build a closure for the log-posterior that only depends on theta.
     def log_post_closure(theta: np.ndarray) -> float:
         return log_posterior(
             theta,
-            t=sim_data.t,
             d=sim_data.d,
             sigma=sim_data.sigma,
+            delta_t=sim_data.delta_t,
+            f_lower=tp.f_lower,
             bounds=cfg.prior_bounds,
-            tau=cfg.tau,
-            phi0=cfg.phi0,
         )
 
     # Choose a sensible starting point for the chain.
-    initial_theta = np.array([0.8, 0.24, 120.0])
+    # compute true Mc and q
+    true_m1, true_m2 = tp.mass1, tp.mass2
+    q_true = true_m1 / true_m2
+    mc_true = (true_m1*true_m2)**(3/5) / (true_m1 + true_m2)**(1/5)
+
+    initial_theta = np.array(
+    [mc_true, q_true, tp.spin1z, tp.spin2z])
 
     # 3. Run MCMC
     mcmc_result = run_mcmc(
@@ -92,10 +98,12 @@ def main() -> None:
     # Discard burn-in and keep the remainder as posterior samples.
     samples = mcmc_result.chain[cfg.burn_in :]
 
-    # Compute a simple posterior mean as a crude "best-fit" estimate.
+    # Posterior mean as a crude "best-fit" estimate.
     theta_mean = samples.mean(axis=0)
-    A_mean, t0_mean, f0_mean = theta_mean
-    print("Posterior mean parameters (A, t0, f0):", theta_mean)
+    mc_mean, q_mean, spin1z_mean, spin2z_mean = theta_mean
+    mass1_mean, mass2_mean = mc_q_to_masses(mc_mean, q_mean)
+
+    print("Posterior mean parameters:", theta_mean)
 
     # 4. Save chain and summary statistics to results/
     chain_path = RESULTS_DIR / "mcmc_chain.npy"
@@ -107,14 +115,17 @@ def main() -> None:
 
     summary: Dict[str, Any] = {
         "true_parameters": {
-            "A": sim_data.true_params.A,
-            "t0": sim_data.true_params.t0,
-            "f0": sim_data.true_params.f0,
+            "mass1": tp.mass1,
+            "mass2": tp.mass2,
+            "spin1z": tp.spin1z,
+            "spin2z": tp.spin2z,
+            "f_lower": tp.f_lower,
         },
         "posterior_mean": {
-            "A": float(A_mean),
-            "t0": float(t0_mean),
-            "f0": float(f0_mean),
+            "mass1": float(mass1_mean),
+            "mass2": float(mass2_mean),
+            "spin1z": float(spin1z_mean),
+            "spin2z": float(spin2z_mean),
         },
         "acceptance_rate": mcmc_result.acceptance_rate,
         "burn_in": cfg.burn_in,
@@ -123,6 +134,8 @@ def main() -> None:
         "data_file": str(data_path),
         "chain_file": str(chain_path),
         "logp_file": str(logp_path),
+        "sigma": sim_data.sigma,
+        "delta_t": sim_data.delta_t,
     }
 
     with open(summary_path, "w", encoding="utf-8") as f:
@@ -133,27 +146,33 @@ def main() -> None:
     print(f"Saved summary JSON to: {summary_path}")
 
     # 5. Make plots in results/
-    best_fit = sine_gaussian(
-        sim_data.t,
-        A=A_mean,
-        t0=t0_mean,
-        f0=f0_mean,
-        tau=cfg.tau,
-        phi0=cfg.phi0,
+    t_model, best_fit = gw_waveform(
+        mass1=mass1_mean,
+        mass2=mass2_mean,
+        spin1z=spin1z_mean,
+        spin2z=spin2z_mean,
+        delta_t=sim_data.delta_t,
+        f_lower=tp.f_lower,
     )
 
+    # Align model to data length for plotting
+    n = min(len(sim_data.t), len(t_model), len(best_fit))
     ts_plot_path = RESULTS_DIR / "timeseries_with_bestfit.png"
     plot_data_and_model(
-        sim_data.t,
-        sim_data.d,
-        best_fit,
-        title="Synthetic data with best-fit sine-Gaussian",
+        sim_data.t[:n],
+        sim_data.d[:n],
+        best_fit[:n],
+        title="Synthetic GW data with best-fit model",
         outfile=ts_plot_path,
     )
     print(f"Saved time-series plot to: {ts_plot_path}")
 
-    labels = ["A", "t0 [s]", "f0 [Hz]"]
-    truths = [sim_data.true_params.A, sim_data.true_params.t0, sim_data.true_params.f0]
+    labels = [
+    r"$\mathcal{M}_c\ [M_\odot]$",
+    r"$q$",
+    r"$\chi_{1z}$",
+    r"$\chi_{2z}$",]
+    truths = [mc_true, q_true, tp.spin1z, tp.spin2z]
     post_plot_path = RESULTS_DIR / "posterior_1d_histograms.png"
     plot_1d_posteriors(
         samples,
