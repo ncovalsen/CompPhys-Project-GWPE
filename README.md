@@ -205,9 +205,12 @@ Coordinates the end-to-end workflow:
 ## Author
 
 **Will Suan**
+
 **Snehal Tibrewal**
+
 **Nicholas Covalsen**
-PHYS 381C Final Project  
+
+
 
 ## References
 
