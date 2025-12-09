@@ -4,6 +4,7 @@ This script:
 1. Generates synthetic data with a known injected GW signal.
 2. Runs a Metropolis–Hastings MCMC sampler to infer the parameters
    (mass1, mass2, spin1z, spin2z) of the signal.
+2.5. Option to toggle between normal and relative binning
 3. Saves the raw chain and summary statistics to the ``results/``
    directory.
 4. Produces diagnostic plots in ``results/``:
