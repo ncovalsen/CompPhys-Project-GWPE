@@ -204,10 +204,10 @@ Coordinates the end-to-end workflow:
 
 ## Author
 
-**Your Name**  
+**Will Suan**
+**Snehal Tibrewal**
+**Nicholas Covalsen**
 PHYS 381C Final Project  
-
-*(Replace “Your Name” with your actual name, and optionally add affiliation or contact information.)*
 
 ## References
 
