@@ -21,7 +21,7 @@ import numpy as np
 
 from toy_inference.config import ToyModelConfig
 from toy_inference.data import simulate_gw_data, save_simulated_data
-from toy_inference.likelihood import log_posterior
+from toy_inference.likelihood import log_posterior, USE_RELATIVE_BINNING, initialize_relative_binning
 from toy_inference.mcmc import run_mcmc
 from toy_inference.plotting import plot_data_and_model, plot_1d_posteriors
 from toy_inference.waveform import gw_waveform
@@ -85,6 +85,20 @@ def main() -> None:
 
     initial_theta = np.array(
     [mc_true, q_true, tp.spin1z, tp.spin2z])
+
+    # 2.5: Enable or disable Relative Binning
+    # USE_RELATIVE_BINNING = False   # Use standard likelihood
+    USE_RELATIVE_BINNING = True      # Use relative-binning likelihood
+
+    if USE_RELATIVE_BINNING:
+        print("Initializing relative binning...")
+        initialize_relative_binning(
+            d=sim_data.d,
+            sigma=sim_data.sigma,
+            delta_t=sim_data.delta_t,
+            f_lower=tp.f_lower,
+        )
+
 
     # 3. Run MCMC
     mcmc_result = run_mcmc(

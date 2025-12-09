@@ -17,8 +17,8 @@ def plot_data_and_model(
     outfile: Optional[Path] = None,
 ) -> None:
     fig, ax = plt.subplots(figsize=(8, 4))
-    ax.plot(t, data, label="data", linewidth=1.0, alpha=0.7)
-    ax.plot(t, model, label="best-fit model", linewidth=2.0)
+    ax.plot(t, data, label="data", linewidth=1.0)
+    ax.plot(t, model, label="best-fit model", linewidth=1.0, linestyle='--')
     ax.set_xlabel("Time [s]")
     ax.set_ylabel("Strain (arb. units)")
     ax.legend()
@@ -39,7 +39,7 @@ def plot_1d_posteriors(
     labels: Sequence[str],
     truths: Optional[Sequence[float]] = None,
     outfile: Optional[Path] = None,
-    bins: int = 50,
+    bins: int = 10,
 ) -> None:
     samples = np.asarray(samples)
     n_params = samples.shape[1]

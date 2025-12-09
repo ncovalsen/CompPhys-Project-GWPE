@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-
+import numpy as np
 from .likelihood import PriorBounds, DEFAULT_PRIOR
 from .mcmc import MCMCConfig
 
@@ -32,8 +32,9 @@ class ToyModelConfig:
     )
     mcmc: MCMCConfig = field(
         default_factory=lambda: MCMCConfig(
-            n_steps=30_000,
-            step_sizes=None,  # will be set in MCMCConfig.__post_init__
+            n_steps=100_000,
+            step_sizes=np.array([0.02, 0.02, 0.005, 0.005]),  # will be set in MCMCConfig.__post_init__
         )
     )
     burn_in: int = 5_000
+    use_relative_binning: bool = False
