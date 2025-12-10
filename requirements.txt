@@ -1,6 +1,4 @@
-### `requirements.txt`
-
-```txt
-numpy
-matplotlib
-pycbc
+numpy~=2.2.0
+matplotlib~=3.10.7
+pycbc~=2.9.0
+pytest~=9.0.2
