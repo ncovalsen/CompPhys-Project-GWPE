@@ -56,14 +56,10 @@ These default settings should run out-of-the-box and demonstrate the full workfl
 
 ## Results and Benchmarks
 
-- **Runtime Benchmarks**
-  - Wall-clock time for baseline (direct) likelihood evaluation.
-  - Wall-clock time for accelerated relative-binning implementation.
-  - Speed-up factor as a function of signal duration or waveform length.
+<img width="1100" height="400" alt="daplot1" src="https://github.com/user-attachments/assets/0fe267de-8d46-413f-84a9-355b96f112ae" />
 
-- **Accuracy / Validation**
-  - Comparison of posteriors from baseline vs relative-binning.
-  - Plots demonstrating that the accelerated likelihood reproduces the full likelihood to acceptable accuracy.
+<img width="1100" height="400" alt="daplot2" src="https://github.com/user-attachments/assets/792993b1-f109-4ee4-84ac-90195c29702a" />
+
 
 Structure:
 
