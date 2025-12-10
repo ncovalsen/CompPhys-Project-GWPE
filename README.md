@@ -54,11 +54,7 @@ This script will:
 
 These default settings should run out-of-the-box and demonstrate the full workflow from data generation to parameter estimation and visualization.
 
-## Results and Benchmarks *(to be added)*
-
-> **Note:** You should update this section once you have benchmark results.
-
-Planned contents for this section:
+## Results and Benchmarks
 
 - **Runtime Benchmarks**
   - Wall-clock time for baseline (direct) likelihood evaluation.
@@ -69,7 +65,7 @@ Planned contents for this section:
   - Comparison of posteriors from baseline vs relative-binning.
   - Plots demonstrating that the accelerated likelihood reproduces the full likelihood to acceptable accuracy.
 
-Suggested placeholder structure (fill these in later):
+Structure:
 
 - `results/benchmark_table.md` – table of timing results.
 - `results/benchmark_plots.png` – plot of runtime vs configuration.
