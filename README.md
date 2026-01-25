@@ -204,7 +204,7 @@ Coordinates the end-to-end workflow:
 
 ## References
 
-You may find the following references useful for context (not required to run the code):
+You may find the following references useful for context:
 
 - N. J. Cornish, **“Fast Fisher Matrices and Lazy Likelihoods”**, arXiv:1007.4820.
 - B. Zackay, L. Dai, and T. Venumadhav, **“Relative Binning and Fast Likelihood Evaluation for Gravitational Wave Parameter Estimation”**, arXiv:1806.08792.
