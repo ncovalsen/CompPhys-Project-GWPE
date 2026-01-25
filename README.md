@@ -2,7 +2,9 @@
 ## Authors
 
 **Will Suan**
+
 **Snehal Tibrewal**
+
 **Nicholas Covalsen**
 
 # Accelerated Likelihood Evaluation for Gravitational Wave Parameter Estimation: Relative Binning
