@@ -1,14 +1,14 @@
 # Accelerated Likelihood Evaluation for Gravitational Wave Parameter Estimation: Relative Binning
 
-This repository contains the code for a *PHYS381C* final project, which implements a **toy model** for gravitational-wave parameter estimation with a focus on accelerating the likelihood evaluation. The goal is to explore the **relative binning** (heterodyning) technique for speeding up Bayesian inference of long-duration signals. In this project, we restrict to a subset of parameters (two masses and two spin components) and compare a baseline MCMC inference with a future accelerated (relative-binning) approach. All code is written in Python and makes use of the PyCBC library for waveform generation.
+This repository contains the code for a *PHY381C*, UT Austin's graduate course in computational physics, final project, which implements a **toy model** for gravitational-wave parameter estimation with a focus on accelerating the likelihood evaluation. The goal is to explore the **relative binning** (heterodyning) technique for speeding up Bayesian inference of long-duration signals. In this project, we restrict to a subset of parameters (two masses and two spin components) and compare a baseline MCMC inference with a future accelerated (relative-binning) approach. All code is written in Python and makes use of the PyCBC library for waveform generation.
 
 ## Authors
 
-**Will Suan**
+**Will Suan, undergraduate in math**
 
-**Snehal Tibrewal**
+**Snehal Tibrewal, PhD student in astrophysics**
 
-**Nicholas Covalsen**
+**Nicholas Covalsen, PhD student in theoretical chemistry**
 
 ## Installation and Setup
 
