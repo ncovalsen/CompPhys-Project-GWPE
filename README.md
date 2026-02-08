@@ -62,12 +62,12 @@ This script will:
 
 These default settings should run out-of-the-box and demonstrate the full workflow from data generation to parameter estimation and visualization.
 
-## Results and Benchmarks
+<!-- ## Results and Benchmarks
 
 <img width="1100" height="400" alt="daplot1" src="https://github.com/user-attachments/assets/0fe267de-8d46-413f-84a9-355b96f112ae" />
 
 <img width="1100" height="400" alt="daplot2" src="https://github.com/user-attachments/assets/792993b1-f109-4ee4-84ac-90195c29702a" />
-
+-->
 
 Structure:
 
